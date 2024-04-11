@@ -2,3 +2,10 @@ body{
     margin: 0;
     background-color: hsl(0, 1%, 29%);
 }
+img{
+    margin-left: 200px;
+    z-index: 2;
+}
+canvas{
+    z-index: 1;
+}
