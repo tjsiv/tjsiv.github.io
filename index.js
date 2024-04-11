@@ -111,7 +111,7 @@ window.addEventListener('keydown', ({key}) => {
             break
     }
 }) 
-function animate(){
+function animate(){//loop to animate the screen and what happens
     requestAnimationFrame(animate)
 
     c.clearRect(0, 0, canvas.width, canvas.height)//clears the previous drawing
