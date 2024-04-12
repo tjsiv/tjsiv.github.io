@@ -162,6 +162,18 @@ function animate(){//loop to animate the screen and what happens
     walls.forEach((Wall) =>{ //walls will not move
         //coordinate check
         Wall.create()
+
+        //colision detec
+        //circle ➡️ square collision detection works by measuring the center position
+        //of the circle plus its radius against the position plus width of the square
+        //as the two objects aproach the value will aproch zero upon getting to close a 
+        //colision is called
+        if(player.coords.y - player.radius <= Wall.coords.y + Wall.height
+        && player.coords.x + player.radius >= Wall.coords.x + Wall.width
+        && player.coords.y + player.radius >= Wall.coords.y 
+        && player.coords.x -player.radius <= Wall.coords.x + Wall.width){
+            console.log('collision')
+        }
     })
     
     player.velocity.y=0
