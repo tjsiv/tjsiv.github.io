@@ -40,6 +40,24 @@ class Player {
     }
 
 }
+const keys = { //we have to declare this class to account for muliple keys getting pressed together
+    w: {
+        pressed: false
+    },
+    s: {
+        pressed: false
+    },
+    a: {
+        pressed: false
+    },
+    d: {
+        pressed: false
+    }
+}//after checking the stae of the key we have more control
+
+let lastKey = ''//had to declare a last key variable to acount for the fact that
+// the animate function couldn't call multiple keys being pressed by the character
+
 
 const player = new Player({ //this is the palyer character
     coords: {
@@ -98,16 +116,40 @@ map.forEach((row, i) =>{ //this is the wall itterator with index of y
 window.addEventListener('keydown', ({key}) => { 
     switch(key) {
         case 'w':
-            player.velocity.y = -5
+            keys.w.pressed = true;
+            lastKey = 'w'
             break
         case 'a':
-            player.velocity.x = -5
+            keys.a.pressed = true;
+            lastKey = 'a'
             break
         case 's':
-            player.velocity.y = 5
+            keys.s.pressed = true;
+            lastKey = 's'
             break
         case 'd':
-            player.velocity.x = 5
+            keys.d.pressed = true;
+            lastKey = 'd'
+            break
+    }
+}) 
+window.addEventListener('keyup', ({key}) => { //to fix diagonal movement
+    switch(key) {
+        case 'w':
+            keys.w.pressed = false;
+            lastKey = 'w'
+            break
+        case 'a':
+            keys.a.pressed = false;
+            lastKey = 'a'
+            break
+        case 's':
+            keys.s.pressed = false;
+            lastKey = 's'
+            break
+        case 'd':
+            keys.d.pressed = false;
+            lastKey = 'd'
             break
     }
 }) 
@@ -121,6 +163,21 @@ function animate(){//loop to animate the screen and what happens
         //coordinate check
         Wall.create()
     })
+    
+    player.velocity.y=0
+    player.velocity.x=0
+
+    //&& lastKey === 'w' this and statement allows us to use more than one 
+    //key to defin our direction and helps fix our diagonal problem
+    if(keys.w.pressed && lastKey === 'w'){
+        player.velocity.y = -5
+    } else if (keys.a.pressed && lastKey === 'a'){
+        player.velocity.x = -5
+    } else if (keys.s.pressed && lastKey === 's'){
+        player.velocity.y = 5
+    } else if (keys.d.pressed && lastKey === 'd'){
+        player.velocity.x = 5
+    }
     
 }
 animate()
