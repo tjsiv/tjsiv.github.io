@@ -71,19 +71,25 @@ const player = new Player({ //this is the palyer character
     
 })
 
+// ['-','-','-','-','-','-','-','-','-','-','-','-','-','-'],
+// ['-',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ','-'],
+// ['-',' ','-',' ',' ','-','-','-',' ',' ',' ',' ',' ','-'],
+// ['-',' ','-',' ','-',' ',' ',' ',' ',' ',' ',' ',' ','-'],
+// ['-',' ','-',' ','-',' ',' ',' ',' ',' ',' ',' ',' ','-'],
+// ['-',' ',' ',' ','-',' ',' ',' ',' ',' ',' ',' ',' ','-'],
+// ['-',' ','-','-','-',' ',' ',' ',' ',' ',' ',' ',' ','-'],
+// ['-',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ','-'],
+// ['-','-','-','-','-','-','-','-','-','-','-','-','-','-']
 
 const map = [ //I can use this as a frame for tthe map we want
 //after I design an outline I can iterate over each row of the map
 //and draw a wall(these will later be replaced with pictures or sprites if time permits)
-    ['-','-','-','-','-','-','-','-','-','-','-','-','-','-'],
-    ['-',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ','-'],
-    ['-',' ',' ',' ',' ','-','-','-',' ',' ',' ',' ',' ','-'],
-    ['-',' ','-',' ','-',' ',' ',' ',' ',' ',' ',' ',' ','-'],
-    ['-',' ','-',' ','-',' ',' ',' ',' ',' ',' ',' ',' ','-'],
-    ['-',' ','-',' ','-',' ',' ',' ',' ',' ',' ',' ',' ','-'],
-    ['-',' ','-','-','-',' ',' ',' ',' ',' ',' ',' ',' ','-'],
-    ['-',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ','-'],
-    ['-','-','-','-','-','-','-','-','-','-','-','-','-','-']
+    ['-','-','-','-','-','-','-'],
+    ['-',' ',' ',' ',' ',' ','-'],
+    ['-',' ','-',' ', '-',' ','-'],
+    ['-',' ',' ',' ',' ',' ','-'],
+    ['-','-','-','-','-','-','-']
+   
     
 ];
 const walls =  [] 
@@ -153,6 +159,19 @@ window.addEventListener('keyup', ({key}) => { //to fix diagonal movement
             break
     }
 }) 
+//colision detec
+    //circle ➡️ square collision detection works by measuring the center position
+    //of the circle plus its radius against the position plus width of the square
+    //as the two objects aproach the value will aproch zero upon getting to close a 
+    //colision is called
+function circleSquareColide({circle, square}) {
+    return(
+        circle.coords.y - circle.radius + circle.velocity.y <= square.coords.y + square.height//top
+        && circle.coords.x + circle.radius + circle.velocity.x >= square.coords.x//left
+        && circle.coords.y + circle.radius + circle.velocity.y >= square.coords.y //down
+        && circle.coords.x -circle.radius + circle.velocity.x <= square.coords.x + square.width
+    )
+}
 function animate(){//loop to animate the screen and what happens
     requestAnimationFrame(animate)
 
@@ -168,21 +187,41 @@ function animate(){//loop to animate the screen and what happens
         //of the circle plus its radius against the position plus width of the square
         //as the two objects aproach the value will aproch zero upon getting to close a 
         //colision is called
-        if(player.coords.y - player.radius <= Wall.coords.y + Wall.height
-        && player.coords.x + player.radius >= Wall.coords.x + Wall.width
-        && player.coords.y + player.radius >= Wall.coords.y 
-        && player.coords.x -player.radius <= Wall.coords.x + Wall.width){
+        if( circleSquareColide({
+            circle: player,
+            square: Wall
+        })){
             console.log('collision')
+            player.velocity.y=0
+            player.velocity.x=0  
         }
     })
     
-    player.velocity.y=0
-    player.velocity.x=0
+    // player.velocity.y=0
+    // player.velocity.x=0
 
     //&& lastKey === 'w' this and statement allows us to use more than one 
     //key to defin our direction and helps fix our diagonal problem
     if(keys.w.pressed && lastKey === 'w'){
-        player.velocity.y = -5
+        
+        for(let i = 0; i < walls.length; i++) {
+
+            const Wall = walls[i]
+            if( circleSquareColide({
+                circle: {...player, velocity: {
+                    x: 0,
+                    y: -5
+                    }
+                },//unique use of spread operator in order to pass ou player
+                square: Wall
+            })) {
+                player.velocity.y = 0   
+                break 
+            } else(
+                player.velocity.y = -5    
+            )
+        }
+        
     } else if (keys.a.pressed && lastKey === 'a'){
         player.velocity.x = -5
     } else if (keys.s.pressed && lastKey === 's'){
