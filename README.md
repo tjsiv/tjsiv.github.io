@@ -1,4 +1,4 @@
-#Title of Project:  _Pacman________________
+#Title of Project:  _The Labyrinth________________
 
 ##Repo Link: https://github.com/tjsiv/Terrence-Sivels-WebGame-MP1
 Description
