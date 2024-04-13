@@ -141,7 +141,7 @@ window.addEventListener('keydown', ({key}) => {
             break
     }
 }) 
-window.addEventListener('keyup', ({key}) => { //to fix diagonal movement
+window.addEventListener('keyup', ({key}) => { //to fix diagonal movement ** this actually caused another issue
     switch(key) {
         case 'w':
             keys.w.pressed = false;
@@ -165,7 +165,7 @@ window.addEventListener('keyup', ({key}) => { //to fix diagonal movement
     //circle ➡️ square collision detection works by measuring the center position
     //of the circle plus its radius against the position plus width of the square
     //as the two objects aproach the value will aproch zero upon getting to close a 
-    //colision is called
+    //colision is called this was orriginally an if else statement but it was too repetitive and messy
     
 function circleSquareColide({circle, square}) {
     return(
@@ -175,6 +175,26 @@ function circleSquareColide({circle, square}) {
         && circle.coords.x -circle.radius + circle.velocity.x <= square.coords.x + square.width
     )
 }
+// this for loop checks the player against every positioned wall in the array
+// we check ahead for a collision by using the function above this in a sense does a bit of predictave
+//colliison detection in order to account for multiple keys pressed together so I pass this for each key
+// for(let i = 0; i < walls.length; i++) {
+
+    //     const wall = walls[i]
+    //     if( circleSquareColide({
+    //         circle: {...player, velocity: {
+    //             x: -5,
+    //             y: 0
+    //             }
+    //         },//spread will save me 🙏
+    //         square: wall
+    //     })) {
+    //         player.velocity.x = -5   
+    //         break 
+    //     } else(
+    //         player.velocity.x = 0    
+    //     )
+    // }
 function animate(){//loop to animate the screen and what happens
     requestAnimationFrame(animate)
 
@@ -182,9 +202,6 @@ function animate(){//loop to animate the screen and what happens
 
     player.refresh() //re create the player locatikon
    
-    
-    // player.velocity.y=0
-    // player.velocity.x=0
 
     //&& lastKey === 'w' this and statement allows us to use more than one 
     //key to defin our direction and helps fix our diagonal problem
