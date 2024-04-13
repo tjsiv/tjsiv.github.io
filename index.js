@@ -86,7 +86,9 @@ const map = [ //I can use this as a frame for tthe map we want
 //and draw a wall(these will later be replaced with pictures or sprites if time permits)
     ['-','-','-','-','-','-','-'],
     ['-',' ',' ',' ',' ',' ','-'],
-    ['-',' ','-',' ', '-',' ','-'],
+    ['-',' ','-',' ','-',' ','-'],
+    ['-',' ',' ',' ',' ',' ','-'],
+    ['-',' ','-',' ','-',' ','-'],
     ['-',' ',' ',' ',' ',' ','-'],
     ['-','-','-','-','-','-','-']
    
@@ -164,6 +166,7 @@ window.addEventListener('keyup', ({key}) => { //to fix diagonal movement
     //of the circle plus its radius against the position plus width of the square
     //as the two objects aproach the value will aproch zero upon getting to close a 
     //colision is called
+    
 function circleSquareColide({circle, square}) {
     return(
         circle.coords.y - circle.radius + circle.velocity.y <= square.coords.y + square.height//top
@@ -178,24 +181,7 @@ function animate(){//loop to animate the screen and what happens
     c.clearRect(0, 0, canvas.width, canvas.height)//clears the previous drawing
 
     player.refresh() //re create the player locatikon
-    walls.forEach((Wall) =>{ //walls will not move
-        //coordinate check
-        Wall.create()
-
-        //colision detec
-        //circle ➡️ square collision detection works by measuring the center position
-        //of the circle plus its radius against the position plus width of the square
-        //as the two objects aproach the value will aproch zero upon getting to close a 
-        //colision is called
-        if( circleSquareColide({
-            circle: player,
-            square: Wall
-        })){
-            console.log('collision')
-            player.velocity.y=0
-            player.velocity.x=0  
-        }
-    })
+   
     
     // player.velocity.y=0
     // player.velocity.x=0
@@ -206,14 +192,14 @@ function animate(){//loop to animate the screen and what happens
         
         for(let i = 0; i < walls.length; i++) {
 
-            const Wall = walls[i]
+            const wall = walls[i]
             if( circleSquareColide({
                 circle: {...player, velocity: {
                     x: 0,
                     y: -5
                     }
-                },//unique use of spread operator in order to pass ou player
-                square: Wall
+                },//spread will save me 🙏
+                square: wall
             })) {
                 player.velocity.y = 0   
                 break 
@@ -223,12 +209,78 @@ function animate(){//loop to animate the screen and what happens
         }
         
     } else if (keys.a.pressed && lastKey === 'a'){
-        player.velocity.x = -5
+
+        for(let i = 0; i < walls.length; i++) {
+
+            const wall = walls[i]
+            if( circleSquareColide({
+                circle: {...player, velocity: {
+                    x: -5,
+                    y: 0
+                    }
+                },//spread will save me 🙏
+                square: wall
+            })) {
+                player.velocity.x = 0   
+                break 
+            } else(
+                player.velocity.x = -5    
+            )
+        }
     } else if (keys.s.pressed && lastKey === 's'){
-        player.velocity.y = 5
+        
+        for(let i = 0; i < walls.length; i++) {
+
+            const wall = walls[i]
+            if( circleSquareColide({
+                circle: {...player, velocity: {
+                    x: 0,
+                    y: 5
+                    }
+                },//spread will save me 🙏
+                square: wall
+            })) {
+                player.velocity.y = 0   
+                break 
+            } else(
+                player.velocity.y = 5    
+            )
+        }
+        
     } else if (keys.d.pressed && lastKey === 'd'){
-        player.velocity.x = 5
+
+        for(let i = 0; i < walls.length; i++) {
+
+            const wall = walls[i]
+            if( circleSquareColide({
+                circle: {...player, velocity: {
+                    x: 5,
+                    y: 0
+                    }
+                },//spread will save me 🙏
+                square: wall
+            })) {
+                player.velocity.x = 0 
+                break 
+            } else(
+                player.velocity.x = 5    
+            )
+        }
     }
+    walls.forEach((Wall) =>{ //walls will not move
+        //coordinate check
+        Wall.create()
+
+        if( circleSquareColide({
+            circle: player,
+            square: Wall
+        })){
+            console.log('collision')
+            player.velocity.y=0
+            player.velocity.x=0  
+        }
+    })
+    
     
 }
 animate()
