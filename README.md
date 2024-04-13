@@ -12,12 +12,13 @@ The writing here should describe in plain, simple language the logic of the game
 
 Describe the logic involved in player decisions.
  	
-	- The player should be able to etraverse the canvas map
+	- The player should be able to traverse the canvas map
 
 ______________________________________________________________
 
 - What happens when the player makes a choice?
-- The player should be able to move up down left and right
+The player should be able to move up down left and right
+to eat pellets and power pellets.
 ______________________________________________________________
 
 
@@ -34,7 +35,7 @@ How will a player know they have won, lost and/or finished the game?
 
 
 	-when all power pellets are collected the player will have won
-	-or if the player collides with a ghost
+	-or if the player collides with a ghost player will lose
 	______________________________________________________________
 
 ______________________________________________________________
