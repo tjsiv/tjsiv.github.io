@@ -42,6 +42,29 @@ class Player {
     }
 
 }
+
+class Monster {
+    constructor({coords, velocity}){
+        this.coords = coords
+        this.velocity = velocity
+        this.radius = 10
+    }
+    create(){
+        c.beginPath()
+        c.arc(this.coords.x, this.coords.y, this.radius, 0, Math.PI * 2)
+        c.fillStyle = 'yellow'
+        c.fill()
+        c.closePath()
+       
+    }
+    refresh() {// this is a way to update the character speed and position
+        this.create()// remakes the character at a position
+        this.coords.x += this.velocity.x
+        this.coords.y += this.velocity.y
+    }
+
+}
+
 class Pellet {
     constructor({coords}){
         this.coords = coords
