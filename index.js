@@ -1,8 +1,10 @@
-const canvas = document.querySelector('canvas') //grab canvas
-const c = canvas.getContext('2d') //get methods for 2d space
+const canvas = document.querySelector('canvas'); //grab canvas
+const c = canvas.getContext('2d'); //get methods for 2d space
 
-canvas.width = innerWidth //let canvas fill screen
-canvas.height = innerHeight
+const scoreTracker = document.querySelector('#scoreTracker');
+
+canvas.width = innerWidth; //let canvas fill screen
+canvas.height = innerHeight;
 
 class Wall { // these walls will be the boundary for the map and the objects in maze
     static width = 40
@@ -23,44 +25,48 @@ class Wall { // these walls will be the boundary for the map and the objects in 
 
 class Player {
     constructor({coords, velocity}){
-        this.coords = coords
-        this.velocity = velocity
-        this.radius = 10
+        this.coords = coords;
+        this.velocity = velocity;
+        this.radius = 15;
     }
     create(){
-        c.beginPath()
-        c.arc(this.coords.x, this.coords.y, this.radius, 0, Math.PI * 2)
-        c.fillStyle = 'yellow'
-        c.fill()
-        c.closePath()
+        c.beginPath();
+        c.arc(this.coords.x, this.coords.y, this.radius, 0, Math.PI * 2);
+        c.fillStyle = 'yellow';
+        c.fill();
+        c.closePath();
        
     }
     refresh() {// this is a way to update the character speed and position
         this.create()// remakes the character at a position
-        this.coords.x += this.velocity.x
-        this.coords.y += this.velocity.y
+        this.coords.x += this.velocity.x;
+        this.coords.y += this.velocity.y;
     }
 
 }
 
 class Monster {
-    constructor({coords, velocity}){
-        this.coords = coords
-        this.velocity = velocity
-        this.radius = 10
+    static speed = 2
+    constructor({coords, velocity, color = 'red'}){
+        this.coords = coords;
+        this.velocity = velocity;
+        this.radius = 15;
+        this.color = color;
+        this.lastCollision = [];
+        this.speed = 2;
     }
     create(){
-        c.beginPath()
-        c.arc(this.coords.x, this.coords.y, this.radius, 0, Math.PI * 2)
-        c.fillStyle = 'yellow'
-        c.fill()
-        c.closePath()
+        c.beginPath();
+        c.arc(this.coords.x, this.coords.y, this.radius, 0, Math.PI * 2);
+        c.fillStyle = this.color;
+        c.fill();
+        c.closePath();
        
     }
     refresh() {// this is a way to update the character speed and position
         this.create()// remakes the character at a position
-        this.coords.x += this.velocity.x
-        this.coords.y += this.velocity.y
+        this.coords.x += this.velocity.x;
+        this.coords.y += this.velocity.y;
     }
 
 }
@@ -111,7 +117,20 @@ const player = new Player({ //this is the palyer character
     
 })
 
-
+const pellets = [];
+const walls =  [];
+const monsters = [
+    new Monster({
+        coords: {
+            x: Wall.width * 6 + Wall.width / 2, 
+            y: Wall.height + Wall.height / 2
+        },
+        velocity: {
+            x: Monster.speed,
+            y: 0
+        }
+    })
+];
 
 const map = [ //I can use this as a frame for tthe map we want
 //after I design an outline I can iterate over each row of the map
@@ -121,25 +140,24 @@ const map = [ //I can use this as a frame for tthe map we want
     ['|', ' ', '.', '.', '.', '.', '.', '.', '.', '.', '|'],
     ['|', '.', '-', '.', '-', '-', '-', '.', '-', '.', '|'],
     ['|', '.', '.', '.', '.', '-', '.', '.', '.', '.', '|'],
+    ['|', '.', '-', '-', '.', '-', '.', '-', '-', '.', '|'],
+    ['|', '.', '.', '.', '.', '.', '.', '.', '.', '.', '|'],
+    ['|', '.', '-', '.', '-', '-', '-', '.', '-', '.', '|'],
+    ['|', '.', '.', '.', '.', '-', '.', '.', '.', '.', '|'],
     ['|', '.', '-', '-', '.', '.', '.', '-', '-', '.', '|'],
-    ['|', '.', '.', '.', '.', '.', '.', '.', '.', '.', '|'],
-    ['|', '.', '-', '.', '-', '.', '-', '.', '-', '.', '|'],
-    ['|', '.', '.', '.', '.', '.', '.', '.', '.', '.', '|'],
-    ['|', '.', '-', '-', '.', '.', '.', '-', '-', '.', '|'],
-    ['|', '.', '.', '.', '.', '.', '.', '.', '.', '.', '|'],
-    ['|', '.', '-', '.', '-', '.', '-', '.', '-', '.', '|'],
+    ['|', '.', '.', '.', '.', '-', '.', '.', '.', '.', '|'],
+    ['|', '.', '-', '.', '-', '-', '-', '.', '-', '.', '|'],
     ['|', '.', '.', '.', '.', '.', '.', '.', '.', '.', '|'],
     ['c', '-', '-', '-', '-', '-', '-', '-', '-', '-', 'c']   
     
 ];
 function genAsset(src){
     const image = new Image();
-    image.src = src
-    return image
+    image.src = src;
+    return image;
 }
 
-const pellets = []
-const walls =  [] 
+
 
 //This for each function below will check every symboll in the array called map and spawn a specific item for each one
 //it checks each row (the arrays of string), then the symbol in them to figure out what to spawn.
@@ -219,7 +237,7 @@ window.addEventListener('keydown', ({key}) => {
             lastKey = 'd'
             break
     }
-}) 
+}); 
 window.addEventListener('keyup', ({key}) => { //to fix diagonal movement ** this actually caused another issue
     switch(key) {
         case 'w':
@@ -239,7 +257,11 @@ window.addEventListener('keyup', ({key}) => { //to fix diagonal movement ** this
             lastKey = 'd'
             break
     }
-}) 
+});
+
+let score = 0;
+
+
 //colision detec
     //circle ➡️ square collision detection works by measuring the center position
     //of the circle plus its radius against the position plus width of the square
@@ -247,11 +269,12 @@ window.addEventListener('keyup', ({key}) => { //to fix diagonal movement ** this
     //colision is called this was orriginally an if else statement but it was too repetitive and messy
     
 function circleSquareColide({circle, square}) {
+    const padding= Wall.width / 2 - circle.radius - 1
     return(
-        circle.coords.y - circle.radius + circle.velocity.y <= square.coords.y + square.height//top
-        && circle.coords.x + circle.radius + circle.velocity.x >= square.coords.x//left
-        && circle.coords.y + circle.radius + circle.velocity.y >= square.coords.y //down
-        && circle.coords.x -circle.radius + circle.velocity.x <= square.coords.x + square.width
+        circle.coords.y - circle.radius + circle.velocity.y <= square.coords.y + square.height + padding//top
+        && circle.coords.x + circle.radius + circle.velocity.x >= square.coords.x - padding//left
+        && circle.coords.y + circle.radius + circle.velocity.y >= square.coords.y - padding//down
+        && circle.coords.x -circle.radius + circle.velocity.x <= square.coords.x + square.width + padding
     )
 }
 // this for loop checks the player against every positioned wall in the array
@@ -274,29 +297,130 @@ function circleSquareColide({circle, square}) {
     //         player.velocity.x = 0    
     //     )
     // }
+
+let animationId;
 function animate(){//loop to animate the screen and what happens
-    requestAnimationFrame(animate)
+    animationId = requestAnimationFrame(animate)
 
     c.clearRect(0, 0, canvas.width, canvas.height)//clears the previous drawing
 
-    pellets.forEach((Pellet) =>{
-        Pellet.create()
+    pellets.forEach((pellet, i) =>{
+        pellet.create();
+        if(Math.hypot(pellet.coords.x - player.coords.x, pellet.coords.y - player.coords.y) < 
+        pellet.radius + player.radius){
+            console.log('touched pell');
+            pellets.splice(i, 1);
+            score += 10;
+            scoreTracker.innerHTML = score;
+        }
     })
 
     walls.forEach((Wall) =>{ //walls will not move
             //coordinate check
-            Wall.create()
+            Wall.create();
 
             if( circleSquareColide({
                 circle: player,
                 square: Wall
             })){
-                console.log('collision')
-                player.velocity.y=0
-                player.velocity.x=0  
+                console.log('collision');
+                player.velocity.y=0;
+                player.velocity.x=0;
             }
-        })
-    player.refresh() //re create the player locatikon
+            
+        });
+    player.refresh() //re create the player location
+
+    monsters.forEach(monster => {
+        monster.refresh();
+
+        const collisions = [];
+        walls.forEach((Wall) =>{ 
+        if( !collisions.includes('right') &&
+            circleSquareColide({ 
+            circle: {...monster, velocity: {
+                x: monster.speed,
+                y: 0
+                }
+            },
+            square: Wall
+        })){
+            collisions.push('right');
+        };
+
+        if( !collisions.includes('left') &&
+            circleSquareColide({
+            circle: {...monster, velocity: {
+                x: -monster.speed,
+                y: 0
+                }
+            },
+            square: Wall
+        })){
+            collisions.push('left');
+        }; 
+
+        if( !collisions.includes('up') &&
+            circleSquareColide({
+            circle: {...monster, velocity: {
+                x: 0,
+                y: -monster.speed
+                }
+            },
+            square: Wall
+        })){
+            collisions.push('up')
+        }; 
+
+        if( !collisions.includes('down') &&
+            circleSquareColide({
+            circle: {...monster, velocity: {
+                x: 0,
+                y: monster.speed
+                }
+            },
+            square: Wall
+        })){
+            collisions.push('down')
+        }; 
+        
+        });
+        if(collisions.length > monster.lastCollision.length)
+        monster.lastCollision = collisions;
+
+        if (JSON.stringify(collisions) !== JSON.stringify(monster.lastCollision)){
+
+            if(monster.velocity.x > 0) monster.lastCollision.push('right')
+            else if(monster.velocity.x < 0) monster.lastCollision.push('left')
+            else if(monster.velocity.y > 0) monster.lastCollision.push('down')
+            else if(monster.velocity.y < 0) monster.lastCollision.push('up')
+
+            const track = monster.lastCollision.filter((collision) => {
+                return !collisions.includes(collision)
+            });
+            const direction = track[Math.floor(Math.random() * track.length)]
+            switch(direction){
+                case 'down':
+                    monster.velocity.y = monster.speed;
+                    monster.velocity.x = 0;
+                    break
+                case 'up':
+                    monster.velocity.y = -monster.speed;
+                    monster.velocity.x = 0;
+                    break
+                case 'right':
+                    monster.velocity.y = 0;
+                    monster.velocity.x = monster.speed;
+                    break
+                case 'left':
+                    monster.velocity.y = 0;
+                    monster.velocity.x = -monster.speed;
+                    break
+                
+            }
+            monster.lastCollision = [];
+        }
+    })
    
 
     //&& lastKey === 'w' this and statement allows us to use more than one 
@@ -305,7 +429,7 @@ function animate(){//loop to animate the screen and what happens
         
         for(let i = 0; i < walls.length; i++) {
 
-            const wall = walls[i]
+            const wall = walls[i];
             if( circleSquareColide({
                 circle: {...player, velocity: {
                     x: 0,
@@ -384,4 +508,4 @@ function animate(){//loop to animate the screen and what happens
     
     
 }
-animate()
+animate();
