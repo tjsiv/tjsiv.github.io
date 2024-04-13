@@ -7,15 +7,16 @@ canvas.height = innerHeight
 class Wall { // these walls will be the boundary for the map and the objects in maze
     static width = 40
     static height = 40
-    constructor({coords}){
+    constructor({coords, image}){
         this.coords = coords //wall location
         this.width = 40 //this is the size and width of each block on the walls
         this.height = 40
+        this.image = image
     }
     create(){ //this will make the blocks in the wall
-        c.fillStyle = 'red'
-        c.fillRect(this.coords.x, this.coords.y, this.width, this.height) //grab coordinate from constuctor
-
+        // c.fillStyle = 'red'
+        // c.fillRect(this.coords.x, this.coords.y, this.width, this.height) //grab coordinate from constuctor
+        c.drawImage(this.image, this.coords.x, this.coords.y)
     }
 }
 
@@ -32,6 +33,7 @@ class Player {
         c.fillStyle = 'yellow'
         c.fill()
         c.closePath()
+       
     }
     refresh() {// this is a way to update the character speed and position
         this.create()// remakes the character at a position
@@ -39,6 +41,21 @@ class Player {
         this.coords.y += this.velocity.y
     }
 
+}
+class Pellet {
+    constructor({coords}){
+        this.coords = coords
+        this.radius = 4
+    }
+    create(){
+        c.beginPath()
+        c.arc(this.coords.x, this.coords.y, this.radius, 0, Math.PI * 2)
+        c.fillStyle = 'white'
+        c.fill()
+        c.closePath()
+       
+    }
+    
 }
 const keys = { //we have to declare this class to account for muliple keys getting pressed together
     w: {
@@ -71,29 +88,34 @@ const player = new Player({ //this is the palyer character
     
 })
 
-// ['-','-','-','-','-','-','-','-','-','-','-','-','-','-'],
-// ['-',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ','-'],
-// ['-',' ','-',' ',' ','-','-','-',' ',' ',' ',' ',' ','-'],
-// ['-',' ','-',' ','-',' ',' ',' ',' ',' ',' ',' ',' ','-'],
-// ['-',' ','-',' ','-',' ',' ',' ',' ',' ',' ',' ',' ','-'],
-// ['-',' ',' ',' ','-',' ',' ',' ',' ',' ',' ',' ',' ','-'],
-// ['-',' ','-','-','-',' ',' ',' ',' ',' ',' ',' ',' ','-'],
-// ['-',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ','-'],
-// ['-','-','-','-','-','-','-','-','-','-','-','-','-','-']
+
 
 const map = [ //I can use this as a frame for tthe map we want
 //after I design an outline I can iterate over each row of the map
 //and draw a wall(these will later be replaced with pictures or sprites if time permits)
-    ['-','-','-','-','-','-','-'],
-    ['-',' ',' ',' ',' ',' ','-'],
-    ['-',' ','-',' ','-',' ','-'],
-    ['-',' ',' ',' ',' ',' ','-'],
-    ['-',' ','-',' ','-',' ','-'],
-    ['-',' ',' ',' ',' ',' ','-'],
-    ['-','-','-','-','-','-','-']
-   
+
+    ['c', '-', '-', '-', '-', '-', '-', '-', '-', '-', 'c'],
+    ['|', ' ', '.', '.', '.', '.', '.', '.', '.', '.', '|'],
+    ['|', '.', '-', '.', '-', '-', '-', '.', '-', '.', '|'],
+    ['|', '.', '.', '.', '.', '-', '.', '.', '.', '.', '|'],
+    ['|', '.', '-', '-', '.', '.', '.', '-', '-', '.', '|'],
+    ['|', '.', '.', '.', '.', '.', '.', '.', '.', '.', '|'],
+    ['|', '.', '-', '.', '-', '.', '-', '.', '-', '.', '|'],
+    ['|', '.', '.', '.', '.', '.', '.', '.', '.', '.', '|'],
+    ['|', '.', '-', '-', '.', '.', '.', '-', '-', '.', '|'],
+    ['|', '.', '.', '.', '.', '.', '.', '.', '.', '.', '|'],
+    ['|', '.', '-', '.', '-', '.', '-', '.', '-', '.', '|'],
+    ['|', '.', '.', '.', '.', '.', '.', '.', '.', '.', '|'],
+    ['c', '-', '-', '-', '-', '-', '-', '-', '-', '-', 'c']   
     
 ];
+function genAsset(src){
+    const image = new Image();
+    image.src = src
+    return image
+}
+
+const pellets = []
 const walls =  [] 
 
 //This for each function below will check every symboll in the array called map and spawn a specific item for each one
@@ -107,11 +129,45 @@ map.forEach((row, i) =>{ //this is the wall itterator with index of y
                         coords: {
                             x: Wall.width * j, //spaces wall by offset from zero of the index count
                             y: Wall.height * i
-                        }
-                        
+                        },
+                        image: genAsset('./assets/stone_wall_1.png')
                      })
                 ) //make a wall for the symbol
                 break
+        
+            case '|':
+                walls.push(
+                    new Wall({
+                        coords: {
+                            x: Wall.width * j, //spaces wall by offset from zero of the index count
+                            y: Wall.height * i
+                        },
+                        image: genAsset('./assets/stone_wall_1_rleft.png')
+                     })
+                ) 
+                break
+            case 'c':
+                walls.push(
+                    new Wall({
+                        coords: {
+                            x: Wall.width * j, //spaces wall by offset from zero of the index count
+                            y: Wall.height * i
+                        },
+                        image: genAsset('./assets/stone_pillar_2.png')
+                     })
+                ) 
+                break
+            case '.':
+                pellets.push(
+                  new Pellet({
+                    coords: {
+                      x: j * Wall.width + Wall.width / 2,
+                      y: i * Wall.height + Wall.height / 2
+                    }
+                  })
+                )
+                break   
+            
         
         }
     })
@@ -200,6 +256,23 @@ function animate(){//loop to animate the screen and what happens
 
     c.clearRect(0, 0, canvas.width, canvas.height)//clears the previous drawing
 
+    pellets.forEach((Pellet) =>{
+        Pellet.create()
+    })
+
+    walls.forEach((Wall) =>{ //walls will not move
+            //coordinate check
+            Wall.create()
+
+            if( circleSquareColide({
+                circle: player,
+                square: Wall
+            })){
+                console.log('collision')
+                player.velocity.y=0
+                player.velocity.x=0  
+            }
+        })
     player.refresh() //re create the player locatikon
    
 
@@ -284,19 +357,7 @@ function animate(){//loop to animate the screen and what happens
             )
         }
     }
-    walls.forEach((Wall) =>{ //walls will not move
-        //coordinate check
-        Wall.create()
-
-        if( circleSquareColide({
-            circle: player,
-            square: Wall
-        })){
-            console.log('collision')
-            player.velocity.y=0
-            player.velocity.x=0  
-        }
-    })
+    
     
     
 }
