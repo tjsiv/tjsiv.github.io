@@ -54,11 +54,12 @@ class Monster {
         this.color = color;
         this.lastCollision = [];
         this.speed = 2;
+        this.scared = false
     }
     create(){
         c.beginPath();
         c.arc(this.coords.x, this.coords.y, this.radius, 0, Math.PI * 2);
-        c.fillStyle = this.color;
+        c.fillStyle = this.scared ? 'blue' : this.color;
         c.fill();
         c.closePath();
        
@@ -75,6 +76,21 @@ class Pellet {
     constructor({coords}){
         this.coords = coords
         this.radius = 4
+    }
+    create(){
+        c.beginPath()
+        c.arc(this.coords.x, this.coords.y, this.radius, 0, Math.PI * 2)
+        c.fillStyle = 'white'
+        c.fill()
+        c.closePath()
+       
+    }
+    
+}
+class PowerPellet {
+    constructor({coords}){
+        this.coords = coords
+        this.radius = 8
     }
     create(){
         c.beginPath()
@@ -118,12 +134,23 @@ const player = new Player({ //this is the palyer character
 })
 
 const pellets = [];
+const powerPellets = []
 const walls =  [];
 const monsters = [
     new Monster({
         coords: {
             x: Wall.width * 6 + Wall.width / 2, 
             y: Wall.height + Wall.height / 2
+        },
+        velocity: {
+            x: Monster.speed,
+            y: 0
+        }
+    }),
+    new Monster({
+        coords: {
+            x: Wall.width * 6 + Wall.width / 2, 
+            y: Wall.height * 3 + Wall.height / 2
         },
         velocity: {
             x: Monster.speed,
@@ -137,7 +164,7 @@ const map = [ //I can use this as a frame for tthe map we want
 //and draw a wall(these will later be replaced with pictures or sprites if time permits)
 
     ['c', '-', '-', '-', '-', '-', '-', '-', '-', '-', 'c'],
-    ['|', ' ', '.', '.', '.', '.', '.', '.', '.', '.', '|'],
+    ['|', '.', '.', '.', '.', '.', '.', '.', '.', 'p', '|'],
     ['|', '.', '-', '.', '-', '-', '-', '.', '-', '.', '|'],
     ['|', '.', '.', '.', '.', '-', '.', '.', '.', '.', '|'],
     ['|', '.', '-', '-', '.', '-', '.', '-', '-', '.', '|'],
@@ -147,7 +174,7 @@ const map = [ //I can use this as a frame for tthe map we want
     ['|', '.', '-', '-', '.', '.', '.', '-', '-', '.', '|'],
     ['|', '.', '.', '.', '.', '-', '.', '.', '.', '.', '|'],
     ['|', '.', '-', '.', '-', '-', '-', '.', '-', '.', '|'],
-    ['|', '.', '.', '.', '.', '.', '.', '.', '.', '.', '|'],
+    ['|', 'p', '.', '.', '.', '.', '.', '.', '.', 'p', '|'],
     ['c', '-', '-', '-', '-', '-', '-', '-', '-', '-', 'c']   
     
 ];
@@ -201,6 +228,16 @@ map.forEach((row, i) =>{ //this is the wall itterator with index of y
             case '.':
                 pellets.push(
                   new Pellet({
+                    coords: {
+                      x: j * Wall.width + Wall.width / 2,
+                      y: i * Wall.height + Wall.height / 2
+                    }
+                  })
+                )
+                break   
+            case 'p':
+                powerPellets.push(
+                  new PowerPellet({
                     coords: {
                       x: j * Wall.width + Wall.width / 2,
                       y: i * Wall.height + Wall.height / 2
@@ -304,6 +341,50 @@ function animate(){//loop to animate the screen and what happens
 
     c.clearRect(0, 0, canvas.width, canvas.height)//clears the previous drawing
 
+    //powerpellet collision
+    for( let i = powerPellets.length - 1; 0 <= i; i--){
+        const powerPellet = powerPellets[i]
+        powerPellet.create();
+
+        if(Math.hypot(powerPellet.coords.x - player.coords.x, powerPellet.coords.y - player.coords.y) < 
+            powerPellet.radius + player.radius){
+                console.log('touched power pellet');
+                powerPellets.splice(i, 1);
+                monsters.forEach(monster => {
+                    monster.scared = true
+                    
+
+                    setTimeout(() => {
+                        monster.scared = false
+                        
+                    }, 3000)
+                })
+        }
+    }
+
+    //monster collision
+    for( let i = monsters.length - 1; 0 <= i; i--){
+        const monster = monsters[i]
+
+        if(Math.hypot(monster.coords.x - player.coords.x, monster.coords.y - player.coords.y) < 
+        monster.radius + player.radius ){
+            if(monster.scared){
+                monsters.splice(i, 1);
+                score += 40;
+            scoreTracker.innerHTML = score;
+            } else{
+                cancelAnimationFrame(animationId)
+                console.log('you lose')
+            }
+        }
+    }
+    //wc
+    if(pellets.length === 0){
+        console.log('you win')
+        cancelAnimationFrame(animationId)
+    }
+    
+    //make and eat pellets
     pellets.forEach((pellet, i) =>{
         pellet.create();
         if(Math.hypot(pellet.coords.x - player.coords.x, pellet.coords.y - player.coords.y) < 
@@ -333,6 +414,7 @@ function animate(){//loop to animate the screen and what happens
 
     monsters.forEach(monster => {
         monster.refresh();
+        
 
         const collisions = [];
         walls.forEach((Wall) =>{ 
