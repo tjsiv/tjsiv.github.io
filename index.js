@@ -1,3 +1,9 @@
+const startScreen = document.getElementById('startScreen');
+const endScreen = document.getElementById('endScreen');
+
+const startButton = document.getElementById('startButton');
+const restartButton = document.getElementById('restartButton');
+
 const canvas = document.querySelector('canvas'); //grab canvas
 const c = canvas.getContext('2d'); //get methods for 2d space
 
@@ -5,6 +11,21 @@ const scoreTracker = document.querySelector('#scoreTracker');
 
 canvas.width = innerWidth; //let canvas fill screen
 canvas.height = innerHeight;
+
+function showStartScreen() {
+    startScreen.style.display = 'block';
+    endScreen.style.display = 'none';
+}
+showStartScreen();
+
+
+let score = 0;
+
+function showEndScreen(score) {
+    startScreen.style.display = 'none';
+    endScreen.style.display = 'block';
+    document.getElementById('finalScore').innerText = score;
+}
 
 class Wall { // these walls will be the boundary for the map and the objects in maze
     static width = 40
@@ -46,31 +67,58 @@ class Player {
 }
 
 class Monster {
-    static speed = 2
-    constructor({coords, velocity, color = 'red'}){
+    static speed = 2;
+
+    constructor({ coords, velocity, color = 'red', imgSrc }) {
+        this.initialCoords = { x: coords.x, y: coords.y }; // Store initial position
         this.coords = coords;
         this.velocity = velocity;
         this.radius = 15;
         this.color = color;
         this.lastCollision = [];
         this.speed = 2;
-        this.scared = false
+        this.scared = false;
+        this.imageLoad = false;
+        this.image = new Image();
+        this.image.src = imgSrc;
+        this.image.onload = () => {
+            this.imageLoad = true;
+        };
     }
-    create(){
-        c.beginPath();
-        c.arc(this.coords.x, this.coords.y, this.radius, 0, Math.PI * 2);
-        c.fillStyle = this.scared ? 'blue' : this.color;
-        c.fill();
-        c.closePath();
-       
+
+    // Create monster
+    create() {
+        if (this.imageLoad) {
+            const scaleWidth = this.image.width * 1.5;
+            const scaleHeight = this.image.height * 1.5;
+            // Adjust the position to center the image
+            const adjustedX = this.coords.x - scaleWidth / 2;
+            const adjustedY = this.coords.y - scaleHeight / 2;
+            c.drawImage(this.image, adjustedX, adjustedY, scaleWidth, scaleHeight);
+        } else {
+            // Fallback to drawing a circle if the image hasn't loaded yet
+            c.beginPath();
+            c.arc(this.coords.x, this.coords.y, this.radius, 0, Math.PI * 2);
+            c.fillStyle = this.scared ? 'blue' : this.color;
+            c.fill();
+            c.closePath();
+        }
     }
-    refresh() {// this is a way to update the character speed and position
-        this.create()// remakes the character at a position
+
+    // Refresh monster
+    refresh() {
+        this.create();
         this.coords.x += this.velocity.x;
         this.coords.y += this.velocity.y;
     }
 
+    // Reset monster position to initial position
+    reset() {
+        this.coords.x = this.initialCoords.x;
+        this.coords.y = this.initialCoords.y;
+    }
 }
+
 
 class Pellet {
     constructor({coords}){
@@ -145,7 +193,8 @@ const monsters = [
         velocity: {
             x: Monster.speed,
             y: 0
-        }
+        },
+        imgSrc: './assets/slime-move.gif'
     }),
     new Monster({
         coords: {
@@ -155,7 +204,19 @@ const monsters = [
         velocity: {
             x: Monster.speed,
             y: 0
-        }
+        }, 
+        imgSrc: './assets/Mino-walk-L-ezgif.com-resize.gif'
+    }),
+    new Monster({
+        coords: {
+            x: Wall.width * 18 + Wall.width / 2, 
+            y: Wall.height  + Wall.height / 2
+        },
+        velocity: {
+            x: Monster.speed,
+            y: 0
+        }, 
+        imgSrc: './assets/Mino-walk-L-ezgif.com-resize.gif'
     })
 ];
 
@@ -163,19 +224,19 @@ const map = [ //I can use this as a frame for tthe map we want
 //after I design an outline I can iterate over each row of the map
 //and draw a wall(these will later be replaced with pictures or sprites if time permits)
 
-    ['c', '-', '-', '-', '-', '-', '-', '-', '-', '-', 'c'],
-    ['|', '.', '.', '.', '.', '.', '.', '.', '.', 'p', '|'],
-    ['|', '.', '-', '.', '-', '-', '-', '.', '-', '.', '|'],
-    ['|', '.', '.', '.', '.', '-', '.', '.', '.', '.', '|'],
-    ['|', '.', '-', '-', '.', '-', '.', '-', '-', '.', '|'],
-    ['|', '.', '.', '.', '.', '.', '.', '.', '.', '.', '|'],
-    ['|', '.', '-', '.', '-', '-', '-', '.', '-', '.', '|'],
-    ['|', '.', '.', '.', '.', '-', '.', '.', '.', '.', '|'],
-    ['|', '.', '-', '-', '.', '.', '.', '-', '-', '.', '|'],
-    ['|', '.', '.', '.', '.', '-', '.', '.', '.', '.', '|'],
-    ['|', '.', '-', '.', '-', '-', '-', '.', '-', '.', '|'],
-    ['|', 'p', '.', '.', '.', '.', '.', '.', '.', 'p', '|'],
-    ['c', '-', '-', '-', '-', '-', '-', '-', '-', '-', 'c']   
+    ['c', '-', '-', '-', '-', '-', '-', '-', '-','-', '-', '-', '-', '-', '-', '-','-', '-', '-', '-', '-', '-', '-','-', '-', '-', '-', '-', '-', '-', '-', 'c'],
+    ['|', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.','.','.','p', '|'],
+    ['|', '.', '-', '.', '-', '-', '-', '.', '-', '.','.', '-', '.', '-', '-', '-', '.', '-', '.','.', '-', '.', '-', '-', '-', '.', '-', '.','.', '-', '.', '|'],
+    ['|', '.', '.', '.', '.', '-', '.', '.', '.', '.','.', '.', '.', '.', '-', '.', '.', '.', '.','.', '.', '.', '.', '-', '.', '.', '.', '-','-', '.', '.', '|'],
+    ['|', '.', '-', '-', '.', '-', '.', '-', '-', '-','-', '-', '-', '.', '-', '.', '-', '-', '.','-', '-', '-', '.', '-', '.', '-', '.', '-','-', '-', '.', '|'],
+    ['|', '.', '.', '.', '.', '.', '.', '.', '.', '.','.', '.', '.', '.', '.', '.', '.', '.', '.','.', '.', '.', '.', '.', '.', '.', '.', '.','.', '.', '.', '|'],
+    ['|', '.', '-', '.', '-', '-', '-', '.', '-', '-','-', '-', '.', '-', '-', '-', '.', '-', '.','.', '-', '.', '-', '-', '-', '.', '-', '.','.', '-', '.', '|'],
+    ['|', '.', '.', '.', '.', '-', '.', '.', '.', '.','.', '.', '.', '.', '-', '.', '.', '.', '.','.', '.', '.', '.', '-', '.', '.', '.', '-','-', '.', '.', '|'],
+    ['|', '.', '-', '-', '.', '.', '.', '-', '-', '.','.', '-', '-', '.', '.', '.', '-', '-', '.','-', '-', '-', '.', '.', '.', '-', '.', '-','.', '-', '.', '|'],
+    ['|', '.', '.', '.', '.', '-', '.', '.', '.', '.','.', '.', '.', '.', '-', '.', '.', '.', '.','.', '.', '.', '.', '-', '.', '.', '.', '.','.', '.', '.', '|'],
+    ['|', '.', '-', '.', '-', '-', '-', '.', '-', '.','-', '.', '-', '-', '-', '.', '-', '.','-', '.', '-', '-', '-', '.', '-', '.','-', '.', '-', '-', '.', '|'],
+    ['|', 'p', '.', '.', '.', '.', '.', '.', '.','.', '.', '.', '.', '.', '.', '.','.', '.', '.', '.', '.', '.', '.','.', '.', '.', '.', '.', '.', '.', 'p', '|'],
+    ['c', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-','-','-', '-', '-', '-', '-', '-', '-', '-', '-','c']   
     
 ];
 function genAsset(src){
@@ -296,7 +357,46 @@ window.addEventListener('keyup', ({key}) => { //to fix diagonal movement ** this
     }
 });
 
-let score = 0;
+
+function resetGame() {
+    // Stop animation loop
+    cancelAnimationFrame(animationId);
+
+    // Reset score and update score display
+    score = 0;
+    scoreTracker.innerHTML = score;
+
+    // Reset player position
+    player.coords.x = Wall.width + Wall.width / 2;
+    player.coords.y = Wall.height + Wall.height / 2;
+
+    // Clear pellet and power pellet arrays
+    pellets.length = 0;
+    powerPellets.length = 0;
+
+    //reset monster coords
+    monsters.forEach(monster => {
+        monster.reset();
+    });
+
+    // Reinitialize pellets and power pellets
+    map.forEach((row, i) => {
+        row.forEach((symbol, j) => {
+            switch (symbol) {
+                case '.':
+                    pellets.push(new Pellet({ coords: { x: j * Wall.width + Wall.width / 2, y: i * Wall.height + Wall.height / 2 } }));
+                    break;
+                case 'p':
+                    powerPellets.push(new PowerPellet({ coords: { x: j * Wall.width + Wall.width / 2, y: i * Wall.height + Wall.height / 2 } }));
+                    break;
+            }
+        });
+    });
+
+    // Show the start screen
+    showStartScreen();
+}
+
 
 
 //colision detec
@@ -314,26 +414,24 @@ function circleSquareColide({circle, square}) {
         && circle.coords.x -circle.radius + circle.velocity.x <= square.coords.x + square.width + padding
     )
 }
-// this for loop checks the player against every positioned wall in the array
-// we check ahead for a collision by using the function above this in a sense does a bit of predictave
-//colliison detection in order to account for multiple keys pressed together so I pass this for each key
-// for(let i = 0; i < walls.length; i++) {
 
-    //     const wall = walls[i]
-    //     if( circleSquareColide({
-    //         circle: {...player, velocity: {
-    //             x: -5,
-    //             y: 0
-    //             }
-    //         },//spread will save me 🙏
-    //         square: wall
-    //     })) {
-    //         player.velocity.x = -5   
-    //         break 
-    //     } else(
-    //         player.velocity.x = 0    
-    //     )
-    // }
+    startButton.addEventListener('click', () => {
+        // Hide start screen
+        startScreen.style.display = 'none';
+        // Start game logic
+        animate();
+    });
+    
+    restartButton.addEventListener('click', () => {
+        // Reset the game
+        resetGame();
+        // Show the start screen
+        showStartScreen();
+        // Start the game animation loop
+
+    });
+    
+    
 
 let animationId;
 function animate(){//loop to animate the screen and what happens
@@ -373,6 +471,7 @@ function animate(){//loop to animate the screen and what happens
                 score += 40;
             scoreTracker.innerHTML = score;
             } else{
+                showEndScreen(score)
                 cancelAnimationFrame(animationId)
                 console.log('you lose')
             }
@@ -380,7 +479,7 @@ function animate(){//loop to animate the screen and what happens
     }
     //wc
     if(pellets.length === 0){
-        console.log('you win')
+        showEndScreen(score)
         cancelAnimationFrame(animationId)
     }
     
@@ -590,4 +689,3 @@ function animate(){//loop to animate the screen and what happens
     
     
 }
-animate();

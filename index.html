@@ -7,6 +7,20 @@
     <link href="style.css" rel="stylesheet">
 </head>
 <body>
+        <!-- Start Screen -->
+    <div id="startScreen">
+        <h1>Welcome to the labyrinth</h1>
+        <p>Use 'w', 'a', 's', and 'd' keys to manuver your way through the labyrinth and avoid monsters</p>
+        <button id="startButton">Start Game</button>
+    </div>
+
+    <!-- End Screen -->
+    <div id="endScreen" style="display: none;">
+        <h1>Game Over</h1>
+        <p>Your Score: <span id="finalScore">0</span></p>
+        <button id="restartButton">Restart</button>
+    </div>
+
         <p>
             <span>Score: </span><span id="scoreTracker">0</span>
         </p>
