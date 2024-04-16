@@ -2,7 +2,7 @@ body {
     margin: 20px;
     background-image: linear-gradient(to right, #0099f7, #f11712);
     padding: 10px 20px;
-    overflow: hidden;
+    
 }
 
 img {
@@ -11,10 +11,12 @@ img {
 }
 
 canvas {
-    display: block;
+    display: flex;
     margin: 0 auto;
-    width: 840px; /* Add 'px' unit */
-    height: 520px; /* Add 'px' unit */
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
 }
 
 p {
