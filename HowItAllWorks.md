@@ -250,3 +250,39 @@ The monster movement in the provided code is controlled by a `refresh` function 
    - The collision detection strategy  involves checking whether the monster's position overlaps with any walls or other obstacles on the game grid.
    - When a collision is detected, the monster's movement direction may be adjusted to avoid getting stuck or overlapping with obstacles.
 
+Certainly! In the code for the Pacman game, the usage of `delta` is in the `animate` function, which is the main game loop. Here's how it's implemented:
+
+```javascript
+function animate() {
+    animationId = requestAnimationFrame(animate);
+
+    // Calculate delta: Time elapsed since the last frame
+    const currentMs = Date.now();
+    const delta = (currentMs - prevMs) / 1000; // Convert milliseconds to seconds
+    prevMs = currentMs;
+
+    // Other game logic...
+
+    // Update game state based on delta
+    player.update(delta); // Example of using delta to update player position
+    monsters.forEach(monster => {
+        monster.update(delta); // Example of using delta to update monster position
+    });
+
+    // Other game logic...
+
+    // Render game state
+    c.clearRect(0, 0, canvas.width, canvas.height);
+    // Render player, monsters, walls, etc.
+
+    // Request next frame
+}
+```
+
+In this implementation:
+
+- `delta` is calculated as the time difference between the current frame (`currentMs`) and the previous frame (`prevMs`). It's expressed in seconds to make it compatible with most game calculations.
+- The `player.update(delta)` method is called, passing `delta` as an argument. Inside the `Player` class, this delta value is likely used to update the player's position based on its velocity.
+- Similarly, the `update(delta)` method is called for each monster in the `monsters` array, allowing them to update their positions based on their velocities and other factors.
+
+By incorporating `delta` into the game loop, the game's behavior remains consistent regardless of the frame rate, ensuring smooth gameplay across different devices and environments.
