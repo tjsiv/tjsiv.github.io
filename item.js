@@ -1,3 +1,4 @@
+//currently only one fruit
 class Item {
     constructor({ coords, imgSrc = './img/sprites/cherry.png' }) {
       this.coords = coords
