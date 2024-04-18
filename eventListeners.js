@@ -39,3 +39,6 @@ addEventListener('keydown', ({ key }) => {
         break
     }
   })
+  //player movement decided on  w a s d
+//with a switch that changes the velocity
+//of the player

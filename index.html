@@ -7,25 +7,55 @@
     <link href="style.css" rel="stylesheet">
 </head>
 <body>
+    <button id="pauseButton">||</button>
         <!-- Start Screen -->
     <div id="startScreen">
-        <h1>Welcome to the labyrinth</h1>
-        <p>Use 'w' to go up, 'a' to go right, 's' to go down, and 'd' to go right to maneuver your way through the labyrinth and avoid monsters</p>
         <button id="startButton">Start Game</button>
     </div>
 
     <!-- End Screen -->
-    <div id="endScreen" style="display: none;">
+    <div id="gameOverScreen" style="display: none;">
         <h1>Game Over</h1>
-        <p>Your Score: <span id="finalScore">0</span></p>
-        <button id="restartButton">Restart</button>
+        <p>Your Score: <span id="gameOverScoreLabel">0</span></p>
+        <button id="restartGameButton">Restart</button>
     </div>
 
         <p>
-            <span>Score: </span><span id="scoreTracker">0</span>
+            <span>Score: </span><span id="scoreEl">0</span>
         </p>
         <canvas></canvas>
+
+    <div id="readyTag">
+        <h1>Welcome to the labyrinth</h1>
+        <p>Use 'w' to go up, 'a' to go right, 's' to go down, and 'd' to go right to maneuver your way through the labyrinth and avoid monsters</p>
+      <h2 class="text-white text-xl">Ready?</h2>
+
+    </div>
+
+    <!-- <div id="goTag">
+    <h1 class="text-white text-xl">Go!</h1>
+   </div> -->
+
         <img src="assets/Mino-walk-L-ezgif.com-resize.gif">
-        <script src="index.js"></script>
+
+
+    <script
+    src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"
+    integrity="sha512-16esztaSRplJROstbIIdwX3N97V1+pZvV33ABoG1H2OyTttBxEGkTsoIVsiP1iaTtM8b3+hu2kB6pQ4Clr5yug=="
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+    ></script>
+    <script src="collideMath.js"></script>
+    <script src="Wall.js"></script>
+    <script src="Monster.js"></script>
+    <script src="Pellet.js"></script>
+    <script src="Player.js"></script>
+    <script src="PowerPellet.js"></script>
+    <script src="Item.js"></script>
+    <script src="eventListeners.js"></script> 
+    <script src="initializeMap.js"></script>
+    <script src="freshIndex.js"></script>
+
+        <!-- <script src="index.js"></script> -->
 </body>
 </html>

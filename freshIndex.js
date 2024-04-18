@@ -7,7 +7,7 @@ document.querySelector('#startButton').addEventListener('click', (e) => {
     setTimeout(() => {
         game.init();
         document.querySelector('#readyTag').style.display = 'none';
-        document.querySelector('#goTag').style.display = 'block';
+        // document.querySelector('#goTag').style.display = 'block';
         document.querySelector('#pauseButton').style.display = 'block';
     }, 2000);
 });
@@ -404,7 +404,7 @@ function animate() {
       game.init()
 
       document.querySelector('#readyTag').style.display = 'none'
-      document.querySelector('#goTag').style.display = 'block'
+    //   document.querySelector('#goTag').style.display = 'block'
       document.querySelector('#pauseButton').style.display = 'block'
       
     }, 2000)

@@ -68,9 +68,9 @@ class Player {
   collision(walls) {
     for (const wall of walls) {
       if (
-        circleCollidesWithRectangle({
+        circleCollidesWithSquare({
           circle: this,
-          rectangle: wall,
+          square: wall,
         })
       ) {
         return true
@@ -92,7 +92,7 @@ class Player {
     const PIXEL_BUFFER = 5
     for (const wall of walls) {
       if (
-        circleCollidesWithRectangle({
+        circleCollidesWithSquare({
           circle: {
             ...this,
             velocity: {
@@ -100,7 +100,7 @@ class Player {
               y: this.desiredDirection.y * PIXEL_BUFFER,
             },
           },
-          rectangle: wall,
+          square: wall,
         })
       ) {
         return false
@@ -145,8 +145,6 @@ class Player {
   }
 
   die(lives, game) {
-    Howler.stop()
-    sound.die.play()
     this.state = 'initDeath'
     gsap.to(this, {
       radians: Math.PI - 0.00001,

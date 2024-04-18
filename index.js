@@ -220,7 +220,7 @@ const monsters = [
     })
 ];
 
-const map = [ //I can use this as a frame for tthe map we want
+const map = [ //I can use this as a frame for tte map we want
 //after I design an outline I can iterate over each row of the map
 //and draw a wall(these will later be replaced with pictures or sprites if time permits)
 

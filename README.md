@@ -1,45 +1,26 @@
-#Title of Project:  _The Labyrinth________________
+# Title of Project: The Labyrinth
 
-##Repo Link: https://github.com/tjsiv/Terrence-Sivels-WebGame-MP1
-Description
+## Repo Link: [The Labyrinth](https://github.com/tjsiv/tjsiv.github.io/)
 
-This is a recreation of the classic game pacman made with js and canvas.
+## Description
 
-##Game Logic
+This project is a recreation of the classic game Pac-Man using JavaScript and Canvas.
 
-The writing here should describe in plain, simple language the logic of the game:
+## Game Logic
 
+### Player Decisions
+The player can move their character around the canvas map, collecting pellets and fruit while avoiding the roaming ghosts.
 
-Describe the logic involved in player decisions.
- 	
-	- The player should be able to traverse the canvas map
+### Player Movement
+The player can move their character in four directions: up, down, left, and right, using the arrow keys or designated controls.
 
-______________________________________________________________
+### Winning and Losing Conditions
+- **Winning:** The player wins the game by collecting all the power pellets scattered across the map.
+- **Losing:** The player loses the game if their character collides with a ghost three times.
 
-- What happens when the player makes a choice?
-The player should be able to move up down left and right
-to eat pellets and power pellets.
-______________________________________________________________
+## Game Completion Indicators
+- **Winning:** When all the power pellets are collected, the player is notified that they have won the game.
+- **Losing:** If the player collides with a ghost three times, they are notified that they have lost the game.
 
-
-Describe the logic that leads to a player winning/closing/ompleting the game.
--colecting all power pellets will win the game
-______________________________________________________________
-
-______________________________________________________________
-
-______________________________________________________________
-
-
-How will a player know they have won, lost and/or finished the game?
-
-
-	-when all power pellets are collected the player will have won
-	-or if the player collides with a ghost player will lose
-	______________________________________________________________
-
-______________________________________________________________
-
-
-
+These descriptions provide a basic understanding of the game's logic and mechanics, helping players navigate through the game and understand the conditions for winning and losing.
 
