@@ -250,7 +250,7 @@ The monster movement in the provided code is controlled by a `refresh` function 
    - The collision detection strategy  involves checking whether the monster's position overlaps with any walls or other obstacles on the game grid.
    - When a collision is detected, the monster's movement direction may be adjusted to avoid getting stuck or overlapping with obstacles.
 
-Certainly! In the code for the Pacman game, the usage of `delta` is in the `animate` function, which is the main game loop. Here's how it's implemented:
+In the code for the Pacman game, the usage of `delta` is in the `animate` function, which is the main game loop. Here's how it's implemented:
 
 ```javascript
 function animate() {
