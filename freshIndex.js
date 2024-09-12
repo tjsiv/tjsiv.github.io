@@ -50,6 +50,7 @@ const maps = [
 ]
 
 let pellets = [];
+let pelletSound = 0
 let powerPellets = [];
 let monsters = [];
 let player = {};
@@ -73,6 +74,7 @@ const keys = {
 }
   
 let lastKey = '';
+let ghostScaredSound
 let score = 0;
 let animationId
 let prevMs = Date.now()
@@ -124,6 +126,8 @@ const monsterCoords = [
   const game = {
     isPaused: false,
     init() {
+      Howler.stop()
+      clearTimeout(ghostScaredSound)
       pellets = []
       powerPellets = []
       items = []
@@ -193,10 +197,13 @@ const monsterCoords = [
         monsters[2].state = null
         monsters[3].state = null
         player.state = 'active'
+        sound.siren.play()
       }, 1000)
     },
     nextRound() {
-  
+    Howler.stop()
+    sound.success.play()
+
       player.state = 'paused'
       monsters.forEach((monster) => {
         monster.state = 'paused'
@@ -232,6 +239,8 @@ const monsterCoords = [
       })
     },
     end() {
+      Howler.stop()
+      sound.gameOver.play()
       document.querySelector('#gameOverScoreLabel').innerHTML = score
       document.querySelector('#gameOverScreen').style.display = 'block'
       document.querySelector('#pauseButton').style.display = 'none'
@@ -308,6 +317,14 @@ function animate() {
         powerPellet.radius + player.radius
       ) {
         powerPellets.splice(i, 1)
+        Howler.stop()
+      sound.powerUp.play()
+      sound.ghostScared.play()
+
+      ghostScaredSound = setTimeout(() => {
+        Howler.stop()
+        sound.siren.play()
+      }, 5000)
 
   
         // make monsters scared
@@ -335,6 +352,7 @@ function animate() {
         item.radius + player.radius
       ) {
 
+        sound.cherry.play()
         items.splice(i, 1)
         score += 50
         scoreEl.innerHTML = score
@@ -353,6 +371,8 @@ function animate() {
         ) <
         pellet.radius + player.radius
       ) {
+        sound.pellets[pelletSound].play()
+        pelletSound = pelletSound === 1 ? 0 : pelletSound + 1
         
         pellets.splice(i, 1)
         score += 15
@@ -398,10 +418,12 @@ function animate() {
   })
 
   document.querySelector('#startButton').addEventListener('click', (e) => {
+    sound.success.play()
     document.querySelector('#startScreen').style.display = 'none'
     document.querySelector('#readyTag').style.display = 'block'
     setTimeout(() => {
       game.init()
+      sound.siren.play()
 
       document.querySelector('#readyTag').style.display = 'none'
     //   document.querySelector('#goTag').style.display = 'block'

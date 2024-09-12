@@ -146,6 +146,8 @@ class Player {
 
   die(lives, game) {
     this.state = 'initDeath'
+    Howler.stop()
+    sound.die.play()
     gsap.to(this, {
       radians: Math.PI - 0.00001,
       onComplete: () => {
